@@ -15,16 +15,26 @@
         <div class="msg" id="msg">Authenticating...</div>
     </div>
     <script>
+        var RELAY_URL = 'https://script.google.com/macros/s/AKfycbw0LNLiy2Zgn5cQ0qIFDQ_e-x0Jjd2QT3pvxHNt9s2qEbOyINYGv5G3ERS6Dwgy3MvV/exec';
         var params = new URLSearchParams(window.location.search);
         var code   = params.get('code');
+        var state  = params.get('state');
         var error  = params.get('error');
+
         if (error) {
             document.getElementById('msg').textContent = 'Access denied. You can close this window.';
-            if (window.opener) window.opener.postMessage({ type: 'dm_auth_error', error: error }, '*');
-        } else if (code) {
-            document.getElementById('msg').textContent = 'Authenticated! You can close this window.';
-            if (window.opener) window.opener.postMessage({ type: 'dm_auth_code', code: code }, '*');
-            setTimeout(function() { window.close(); }, 1500);
+        } else if (code && state) {
+            fetch(RELAY_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ state: state, code: code })
+            })
+            .then(function() {
+                document.getElementById('msg').textContent = 'Authenticated! You can close this window.';
+            })
+            .catch(function() {
+                document.getElementById('msg').textContent = 'Error sending code. Please try again.';
+            });
         } else {
             document.getElementById('msg').textContent = 'Invalid parameters.';
         }
