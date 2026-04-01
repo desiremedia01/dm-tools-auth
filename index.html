@@ -26,15 +26,11 @@
         } else if (code && state) {
             fetch(RELAY_URL, {
                 method: 'POST',
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ state: state, code: code })
-            })
-            .then(function() {
-                document.getElementById('msg').textContent = 'Authenticated! You can close this window.';
-            })
-            .catch(function() {
-                document.getElementById('msg').textContent = 'Error sending code. Please try again.';
             });
+            document.getElementById('msg').textContent = 'Authenticated! You can close this window.';
         } else {
             document.getElementById('msg').textContent = 'Invalid parameters.';
         }
